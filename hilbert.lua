@@ -162,14 +162,12 @@ end
 --- DOCME
 -- [LINK](http://www.hackersdelight.org/HDcode/hilbert/hil_inc_xy.c.txt)
 -- @uint order
--- @uint x
--- @uint y
+-- @uint[opt=0] x
+-- @uint[opt=0] y
 -- @treturn uint X
 -- @treturn uint Y
 function M.GetXY_Incremental (order, x, y)
-	if not x or not y then
-		x, y = 0, 0
-	end
+	x, y = x or 0, y or 0
 
 	local state, dx, dy = 0
 

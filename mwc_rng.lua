@@ -58,7 +58,7 @@ else -- Otherwise, make equivalents for RNG purposes
 	end
 end
 
--- Module table --
+-- Exports --
 local M = {}
 
 --- Factory.
