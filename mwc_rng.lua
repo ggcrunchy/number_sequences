@@ -62,11 +62,28 @@ end
 local M = {}
 
 --- Factory.
--- @uint[opt] z Z seed; if absent, uses a default.
--- @uint[opt] w W Seed; if absent, uses a default.
+-- @ptable[opt] opts Generator options. Fields:
+--
+-- * **z** Z seed; if absent, uses a default.
+-- * **w** W Seed; if absent, uses a default.
+-- * **get_zw**: If true, the second return value is a getter function.
 -- @treturn function Called as `result = gen(want_real)`. If _want\_real_ is true, _result_
 -- will be a random number &isin; [0, 1); otherwise, it will be a random 32-bit integer.
-function M.MakeGenerator (z, w)
+-- @treturn ?|function|nil Called as `z, w = get_zw()`, to get the current generator state,
+-- which may be used to clone or restart the generator later.
+function M.MakeGenerator (opts)
+	local z, w, get_zw
+
+	if opts then
+		z, w = opts.z, opts.w
+
+		if opts.get_zw then
+			function get_zw ()
+				return z, w
+			end
+		end
+	end
+
 	local zdef, wdef = not z, not w
 
 	z = z or 362436069
@@ -104,15 +121,15 @@ function M.MakeGenerator (z, w)
 		end
 
 		return result
-	end
+	end, get_zw
 end
 
 --- Variant of @{MakeGenerator} with behavior like @{math.random}.
--- @uint[opt] z Z seed; if absent, uses a default.
--- @uint[opt] w W Seed; if absent, uses a default.
+-- @ptable[opt] opts As per @{MakeGenerator}.
 -- @treturn function Generator with the semantics of @{math.random}.
-function M.MakeGenerator_Lib (z, w)
-	local gen = _MakeGenerator_(z, w)
+-- @treturn ?|function|nil As per @{MakeGenerator}.
+function M.MakeGenerator_Lib (opts)
+	local gen, get_zw = _MakeGenerator_(opts)
 
 	return function(a, b)
 		if a then
@@ -124,7 +141,7 @@ function M.MakeGenerator_Lib (z, w)
 		else
 			return gen(true)
 		end
-	end
+	end, get_zw
 end
 
 -- Cache module members.
