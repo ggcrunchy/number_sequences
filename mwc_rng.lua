@@ -137,7 +137,7 @@ function M.MakeGenerator_Lib (opts)
 				a, b = 1, a
 			end
 
-			return a + gen() % (b - a)
+			return a + gen() % (b - a + 1)
 		else
 			return gen(true)
 		end
