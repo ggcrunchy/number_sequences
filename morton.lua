@@ -204,7 +204,7 @@ local AuxLine2_Y = LineIter(M.MortonPair_Y, M.MortonPairUpdate_Y)
 function M.Morton2_LineY (x, y1, y2)
 	y1, y2 = GetRange(y1, y2 or 0xFFFF)
 
-	return AuxLine2_Y, _Morton2_(x, y2), Value0(_Morton2_(x, y2))
+	return AuxLine2_Y, _Morton2_(x, y2), Value0(_Morton2_(x, y1))
 end
 
 --- Builds a Morton number out of three parts.
