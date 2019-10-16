@@ -61,6 +61,10 @@ end
 -- Exports --
 local M = {}
 
+--
+--
+--
+
 --- Factory.
 -- @ptable[opt] opts Generator options. Fields:
 --
@@ -144,8 +148,6 @@ function M.MakeGenerator_Lib (opts)
 	end, get_zw
 end
 
--- Cache module members.
 _MakeGenerator_ = M.MakeGenerator
 
--- Export the module.
 return M

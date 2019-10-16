@@ -42,6 +42,10 @@ local _GrayToBinary_
 -- Exports --
 local M = {}
 
+--
+--
+--
+
 --- Converts an unsigned integer (binary) to a Gray code.
 --
 -- This is an inverse of @{GrayToBinary}.
@@ -137,9 +141,7 @@ function M.Next_Change (gray)
 	return Change(_GrayToBinary_(gray) + 1)
 end
 
--- Cache module members.
 _BinaryToGray_ = M.BinaryToGray
 _GrayToBinary_ = M.GrayToBinary
 
--- Export the module.
 return M

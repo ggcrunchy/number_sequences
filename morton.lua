@@ -40,6 +40,10 @@ local _Morton3_
 local M = {}
 
 --
+--
+--
+
+--
 local function AuxPair (mnum)
 	mnum = band(0x55555555, mnum)
 	mnum = band(0x33333333, bor(mnum, rshift(mnum, 1)))
@@ -247,7 +251,6 @@ function M.Morton3_LineZ (x, y, z1, z2)
 	return AuxLine3_Z, _Morton3_(x, y, z2), Value0(_Morton3_(x, y, z1))
 end
 
--- Cache module members.
 _Morton2_ = M.Morton2
 _Morton3_ = M.Morton3
 
@@ -255,5 +258,4 @@ _Morton3_ = M.Morton3
 -- ^^^ Distances
 -- http://en.wikipedia.org/wiki/Z-order_curve: add / sub, comp func
 
--- Export the module.
 return M

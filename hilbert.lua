@@ -68,6 +68,10 @@ end
 local M = {}
 
 --
+--
+--
+
+--
 local function AuxHilbert (order, dir, rot, step)
 	order = order - 1
 
@@ -206,5 +210,4 @@ function M.GetS (order, x, y)
 	return s
 end
 
--- Export the module.
 return M
