@@ -65,27 +65,23 @@ local M = {}
 --
 --
 
---- Factory.
+--- Instantiates a new random generator.
 -- @ptable[opt] opts Generator options. Fields:
 --
 -- * **z** Z seed; if absent, uses a default.
 -- * **w** W Seed; if absent, uses a default.
--- * **get_zw**: If true, the second return value is a getter function.
--- @treturn function Called as `result = gen(want_real)`. If _want\_real_ is true, _result_
--- will be a random number &isin; [0, 1); otherwise, it will be a random 32-bit integer.
--- @treturn ?|function|nil Called as `z, w = get_zw()`, to get the current generator state,
--- which may be used to clone or restart the generator later.
+-- @treturn function May be called as `z, w = gen("get_zw")`, in which case _z_ and _w_ will
+-- be the current Z and W seeds, respectively.
+--
+-- Otherwise, called as `result = gen(how)`. When _how_ is **"float"**, _result_ will be a
+-- random number &isin; [0, 1); with anything else, it will instead be a random non-negative
+-- 32-bit integer.
 function M.MakeGenerator (opts)
-	local z, w, get_zw
+	local z, w
+
 
 	if opts then
 		z, w = opts.z, opts.w
-
-		if opts.get_zw then
-			function get_zw ()
-				return z, w
-			end
-		end
 	end
 
 	local zdef, wdef = not z, not w
@@ -95,8 +91,8 @@ function M.MakeGenerator (opts)
 
 	-- Mix the words together if only one seed was specified.
 	if zdef ~= wdef then
-		z = 36969 * band(z, 0xFFFF) + rshift(w, 16)
-		w = 18000 * band(w, 0xFFFF) + rshift(z, 16)
+		z = (36969 * band(z, 0xFFFF) + rshift(w, 16)) % 2^32
+		w = (18000 * band(w, 0xFFFF) + rshift(z, 16)) % 2^32
 	end
 
 	--[[
@@ -114,36 +110,45 @@ function M.MakeGenerator (opts)
 		and k*2^15-1 are prime)
 	]]
 
-	return function(want_real)
+	return function(how)
+		if how == "get_zw" then
+			return z, w
+		end
+
 		z = 36969 * band(z, 0xFFFF) + rshift(z, 16)
 		w = 18000 * band(w, 0xFFFF) + rshift(w, 16)
 
-		local result = lshift(z, 16) + band(w, 0xFFFF)
+		local result = (lshift(z, 16) + band(w, 0xFFFF)) % 2^32
 
-		if want_real then
+		if how == "float" then
 			result = result * 2.328306e-10
 		end
 
 		return result
-	end, get_zw
+	end
 end
 
 --- Variant of @{MakeGenerator} with behavior like @{math.random}.
 -- @ptable[opt] opts As per @{MakeGenerator}.
 -- @treturn function Generator with the semantics of @{math.random}.
 -- @treturn ?|function|nil As per @{MakeGenerator}.
+--
+-- This may also be called as `z, w = gen("get_zw")`, in which case _z_ and _w_ will be the
+-- current Z and W seeds, respectively.
 function M.MakeGenerator_Lib (opts)
 	local gen, get_zw = _MakeGenerator_(opts)
 
 	return function(a, b)
-		if a then
+		if a == "get_zw" then
+			return gen("get_zw")
+		elseif a then
 			if not b then
 				a, b = 1, a
 			end
 
 			return a + gen() % (b - a + 1)
 		else
-			return gen(true)
+			return gen("float")
 		end
 	end, get_zw
 end
